@@ -1,18 +1,29 @@
 package fr.polytech.sim.cycling;
 
 import fr.polytech.sim.Simulation;
-import fr.polytech.sim.log.FileLogger;
 import fr.polytech.sim.log.Logger;
+import fr.polytech.sim.utils.Context;
+
+import java.util.Iterator;
 
 /**
  * Bike simulation.
  */
 public class BikeSimulator implements Simulation {
-    private final Logger logger = new FileLogger("BikeSimulator");
+    private final Logger logger = Logger.createLogger("BikeSimulator");
 
     public void run() {
-        Bike bike = new SimpleBike();
-        this.logger.log("Bike's speed %.2f Km/h.", bike.getVelocity());
-        this.logger.log("Bike's mass %.2f Kg.", bike.getMass());
+        Iterator it = Context.injectAll(Bike.class);
+
+        while (it.hasNext()) {
+            Bike bike = (Bike) it.next();
+            if ( bike instanceof TagAlongBike ) {
+                this.logger.log("Création d'un velo TagAlongBike");
+            } else {
+                this.logger.log("Création d'un velo seulement Bike");
+            }
+            this.logger.log("Bike's speed : " +  Math.round(bike.getVelocity()) + " Km/h.");
+        }
+
     }
 }

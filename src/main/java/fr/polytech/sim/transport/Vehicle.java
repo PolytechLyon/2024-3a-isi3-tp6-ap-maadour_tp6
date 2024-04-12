@@ -1,18 +1,16 @@
 package fr.polytech.sim.transport;
 
-import fr.polytech.sim.log.ConsoleLogger;
 import fr.polytech.sim.log.Logger;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
+
+import java.util.*;
 
 /**
  * Vehicle abstraction.
  */
-public abstract class Vehicle implements MobileObject {
+public abstract class Vehicle implements Mobile {
 
-    private final Logger logger = new ConsoleLogger("Vehicle");
-    protected final Set<MobileObject> components = new HashSet<>();
+    private final Logger logger = Logger.createLogger("Vehicle");
+    protected final List<Mobile> components = new ArrayList<>();
 
     /**
      * Force applied to push the vehicle.
@@ -29,30 +27,22 @@ public abstract class Vehicle implements MobileObject {
      */
     @Override
     public double getVelocity() {
-        Iterator<MobileObject> iterator = components.iterator();
-        double sumPonderedVelocities = 0;
-        double sumMass = 0;
+        Iterator<Mobile> iterator = components.iterator();
+        double sum = 0;
+        int count = 0;
+        double lastSpeed = 0;
+        boolean inSync = true;
         while (iterator.hasNext()) {
-            MobileObject item = iterator.next();
-            sumPonderedVelocities += item.getVelocity() * item.getMass();
-            sumMass += item.getMass();
+            Mobile component = iterator.next();
+            double speed = component.getVelocity();
+            if (count != 0) {
+                inSync &= speed == lastSpeed;
+            }
+            lastSpeed = speed;
+            sum += speed;
+            count++;
         }
-        double velocity = sumPonderedVelocities == 0 ? 0 :
-                sumPonderedVelocities / sumMass;
-        this.logger.log("Velocity %.2f Km/h.", velocity);
-        return velocity;
-    }
-
-    /**
-     * Calculate and return vehicle's mass as the sum of individual masses of
-     * its components.
-     *
-     * @return vehicle mass
-     */
-    @Override
-    public double getMass() {
-        return this.components.stream()
-                .mapToDouble(MobileObject::getMass)
-                .sum();
+        logger.log(inSync ? "Components are in sync" : "⚠ Components are out of sync. ⚠");
+        return sum / count;
     }
 }
