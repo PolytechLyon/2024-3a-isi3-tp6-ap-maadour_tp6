@@ -1,11 +1,15 @@
 package fr.polytech.sim.cycling;
 
+import fr.polytech.sim.transport.Pushable;
 import fr.polytech.sim.transport.Vehicle;
+import fr.polytech.sim.transport.Wheel;
 
-/**
- * Abstract bike.
- */
-public abstract class Bike extends Vehicle {
+public class Bike extends Vehicle implements Pushable {
+
+    public Bike() {
+        components.add(new Wheel(this));
+        components.add(new Wheel(this));
+    }
 
     @Override
     public double getPush() {

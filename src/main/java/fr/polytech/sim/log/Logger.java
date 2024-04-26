@@ -12,4 +12,8 @@ public interface Logger {
      * @param args      message arguments
      */
     void log(String format, Object... args);
+
+    static Logger createLogger(String name){
+        return new FileLogger(name);
+    }
 }
